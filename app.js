@@ -325,23 +325,30 @@ $('#btn-sign').addEventListener('click', async () => {
   const id = $('#sign-identity').value; if (!id) return alert('Select identity');
   const rec = await db.ids.getItem(id); if (!rec) return alert('Invalid identity');
   const corner = $('#qr-corner').value;
-  const percent = parseInt($('#qr-size').value, 10);
+  let percent = parseInt($('#qr-size').value, 10);
   try {
-    const { hash, rect } = await computeHashWithBlackSquare(currentCanvas, corner, percent);
-    const payload = {
-      version:1,
-      algo:rec.algo,
-      imageHash: b64u(hash),
-      signerPub: b64u(rec.pubRaw),
-      timestamp: new Date().toISOString(),
-      corner,
-      percent,
-      optional: { note: $('#sign-note').value || undefined }
-    };
-    const payloadBytes = enc.encode(JSON.stringify(payload));
-    const sig = await signBytes(rec, payloadBytes);
-
-    const token = JSON.stringify({ v:1, alg:payload.algo, pk:payload.signerPub, ts:payload.timestamp, ih:payload.imageHash, c:payload.corner, p:payload.percent, sig:b64u(sig) });
+    const shortSide = Math.min(currentCanvas.width, currentCanvas.height);
+    let payload, sig, token, hash, rect;
+    while (true) {
+      ({ hash, rect } = await computeHashWithBlackSquare(currentCanvas, corner, percent));
+      payload = {
+        version:1,
+        algo:rec.algo,
+        imageHash: b64u(hash),
+        signerPub: b64u(rec.pubRaw),
+        timestamp: new Date().toISOString(),
+        corner,
+        percent,
+        optional: { note: $('#sign-note').value || undefined }
+      };
+      const payloadBytes = enc.encode(JSON.stringify(payload));
+      sig = await signBytes(rec, payloadBytes);
+      token = JSON.stringify({ v:1, alg:payload.algo, pk:payload.signerPub, ts:payload.timestamp, ih:payload.imageHash, c:payload.corner, p:payload.percent, sig:b64u(sig) });
+      const qrObj = QRCode.create(token, { errorCorrectionLevel: 'M' });
+      const minSize = qrObj.modules.size * 3;
+      if (rect.size >= minSize) break;
+      percent = Math.ceil((minSize / shortSide) * 100);
+    }
     await drawQR(currentCanvas, token, rect);
 
     const ok = await verifyFromCanvas(currentCanvas);
