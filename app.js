@@ -326,6 +326,7 @@ $('#btn-sign').addEventListener('click', async () => {
   const rec = await db.ids.getItem(id); if (!rec) return alert('Invalid identity');
   const corner = $('#qr-corner').value;
   const percent = parseInt($('#qr-size').value, 10);
+  const comment = $('#sign-comment')?.value?.trim();
   try {
     const { hash, rect } = await computeHashWithBlackSquare(currentCanvas, corner, percent);
     const payload = {
@@ -335,13 +336,14 @@ $('#btn-sign').addEventListener('click', async () => {
       signerPub: b64u(rec.pubRaw),
       timestamp: new Date().toISOString(),
       corner,
-      percent,
-      optional: { note: $('#sign-note').value || undefined }
+      percent
     };
+    if (comment) payload.comment = comment;
     const payloadBytes = enc.encode(JSON.stringify(payload));
     const sig = await signBytes(rec, payloadBytes);
-
-    const token = JSON.stringify({ v:1, alg:payload.algo, pk:payload.signerPub, ts:payload.timestamp, ih:payload.imageHash, c:payload.corner, p:payload.percent, sig:b64u(sig) });
+    const tokenObj = { v:1, alg:payload.algo, pk:payload.signerPub, ts:payload.timestamp, ih:payload.imageHash, c:payload.corner, p:payload.percent, sig:b64u(sig) };
+    if (comment) tokenObj.cm = comment;
+    const token = JSON.stringify(tokenObj);
     await drawQR(currentCanvas, token, rect);
 
     const ok = await verifyFromCanvas(currentCanvas);
@@ -363,10 +365,11 @@ async function verifyFromCanvas(canvas) {
   const code = jsQR(img.data, img.width, img.height);
   if (!code) return { verified:false, reason:'No QR found' };
   let token; try { token = JSON.parse(code.data); } catch { return { verified:false, reason:'QR not JSON' }; }
-  const { v, alg, pk, ts, ih, c, p, sig } = token;
+  const { v, alg, pk, ts, ih, c, p, sig, cm } = token;
   const { hash } = await computeHashWithBlackSquare(canvas, c, p);
   const hashB64 = b64u(hash);
   const payload = { version:1, algo:alg, imageHash:hashB64, signerPub:pk, timestamp:ts, corner:c, percent:p };
+  if (cm) payload.comment = cm;
   const payloadBytes = enc.encode(JSON.stringify(payload));
   let pub;
   try { pub = await importPubKey(alg, { kty:'OKP', crv:'Ed25519', x: pk }); }
@@ -375,7 +378,7 @@ async function verifyFromCanvas(canvas) {
   return {
     verified: ok && (hashB64 === ih),
     reason: ok ? (hashB64===ih? 'OK':'Hash mismatch') : 'Bad signature',
-    details: { alg, publicKey: pk, timestamp: ts, imageHashComputed: hashB64, imageHashQR: ih }
+    details: { alg, publicKey: pk, timestamp: ts, comment: cm, imageHashComputed: hashB64, imageHashQR: ih }
   };
 }
 
