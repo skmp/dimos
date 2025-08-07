@@ -85,8 +85,8 @@ export async function computeHashWithBlackSquare(imgCanvas, corner, percent) {
   const r = placeRect(c.width, c.height, percent, corner);
   ctx.fillStyle = '#000';
   ctx.fillRect(r.x, r.y, r.size, r.size);
-  const bytes = await canvasToPngBytes(c);
-  return { hash: await sha256(bytes), bytes, rect: r };
+  const imgData = ctx.getImageData(0, 0, c.width, c.height).data;
+  return { hash: await sha256(imgData), rect: r };
 }
 
 export async function drawQR(canvas, text, rect) {
