@@ -343,7 +343,7 @@ $('#btn-sign').addEventListener('click', async () => {
       };
       const payloadBytes = enc.encode(JSON.stringify(payload));
       sig = await signBytes(rec, payloadBytes);
-      token = JSON.stringify({ v:1, alg:payload.algo, pk:payload.signerPub, ts:payload.timestamp, ih:payload.imageHash, c:payload.corner, p:payload.percent, sig:b64u(sig) });
+      token = JSON.stringify({ v:1, alg:payload.algo, pk:payload.signerPub, ts:payload.timestamp, ih:payload.imageHash, c:payload.corner, p:payload.percent, n:payload.optional.note, sig:b64u(sig) });
       const qrObj = QRCode.create(token, { errorCorrectionLevel: 'M' });
       const minSize = qrObj.modules.size * 3;
       if (rect.size >= minSize) break;
@@ -370,10 +370,10 @@ async function verifyFromCanvas(canvas) {
   const code = jsQR(img.data, img.width, img.height);
   if (!code) return { verified:false, reason:'No QR found' };
   let token; try { token = JSON.parse(code.data); } catch { return { verified:false, reason:'QR not JSON' }; }
-  const { v, alg, pk, ts, ih, c, p, sig } = token;
+  const { v, alg, pk, ts, ih, c, p, n, sig } = token;
   const { hash } = await computeHashWithBlackSquare(canvas, c, p);
   const hashB64 = b64u(hash);
-  const payload = { version:1, algo:alg, imageHash:hashB64, signerPub:pk, timestamp:ts, corner:c, percent:p };
+  const payload = { version:1, algo:alg, imageHash:hashB64, signerPub:pk, timestamp:ts, corner:c, percent:p, optional:{ note:n } };
   const payloadBytes = enc.encode(JSON.stringify(payload));
   let pub;
   try { pub = await importPubKey(alg, { kty:'OKP', crv:'Ed25519', x: pk }); }
@@ -382,7 +382,7 @@ async function verifyFromCanvas(canvas) {
   return {
     verified: ok && (hashB64 === ih),
     reason: ok ? (hashB64===ih? 'OK':'Hash mismatch') : 'Bad signature',
-    details: { alg, publicKey: pk, timestamp: ts, imageHashComputed: hashB64, imageHashQR: ih }
+    details: { alg, publicKey: pk, timestamp: ts, note:n, imageHashComputed: hashB64, imageHashQR: ih }
   };
 }
 
