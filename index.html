@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Dimos SPA</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    section { border: 1px solid #ccc; padding: 10px; margin-bottom: 20px; }
+    canvas { max-width: 100%; }
+    #downloadLink { display: none; }
+    .qrModal { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.5); display:none; align-items:center; justify-content:center; }
+    .qrModalContent { background: #fff; padding:20px; }
+  </style>
+</head>
+<body>
+<h1>Dimos Demo</h1>
+
+<section id="identitySection">
+  <h2>Identities</h2>
+  <input id="idName" placeholder="Name" />
+  <button id="createId">Create</button>
+  <ul id="identityList"></ul>
+</section>
+
+<section id="contactSection">
+  <h2>Contacts</h2>
+  <input id="contactText" placeholder='{"name":"Alice","publicKey":"..."}' size="40" />
+  <button id="addContactText">Add from Text</button>
+  <input type="file" id="contactQR" accept="image/*" />
+  <button id="addContactQR">Add from QR</button>
+  <ul id="contactList"></ul>
+</section>
+
+<section id="signSection">
+  <h2>Sign Photo</h2>
+  <label>Identity: <select id="signIdentity"></select></label>
+  <label>Corner: <select id="qrCorner"><option value="tl">Top Left</option><option value="tr">Top Right</option><option value="bl">Bottom Left</option><option value="br">Bottom Right</option></select></label>
+  <input type="file" id="photoInput" accept="image/*" capture="environment" />
+  <button id="signBtn">Sign</button>
+  <a id="downloadLink" download="signed.png">Download Signed Photo</a>
+</section>
+
+<section id="verifySection">
+  <h2>Verify Photo</h2>
+  <input type="file" id="verifyInput" accept="image/*" />
+  <button id="verifyBtn">Verify</button>
+  <div id="verifyResult"></div>
+</section>
+
+<canvas id="workCanvas" style="display:none"></canvas>
+<div id="qrModal" class="qrModal"><div class="qrModalContent"><div id="qrOutput"></div><button id="closeQR">Close</button></div></div>
+
+<script src="https://cdn.jsdelivr.net/npm/tweetnacl@1.0.3/nacl.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
