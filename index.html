@@ -223,6 +223,15 @@
   </section>
 </main>
 
+<div id="share-modal" class="modal" style="display:none">
+  <div class="inner">
+    <h2>Share Identity</h2>
+    <canvas id="share-qr" width="256" height="256"></canvas>
+    <div id="share-name" class="foot"></div>
+    <div style="margin-top:12px"><button class="btn" id="share-close">Close</button></div>
+  </div>
+</div>
+
 <!-- Dependencies via CDN (no build step) -->
 <script src="https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
