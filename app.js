@@ -150,7 +150,13 @@ async function verifySig(algo, pubKey, bytes, sig) {
 
 // ---------- UI Tabs ----------
 const tabs = $$('.tab');
-$$('nav button').forEach(btn => btn.addEventListener('click', () => switchTab(btn.dataset.tab)));
+$$('nav button').forEach(btn => btn.addEventListener('click', () => {
+  switchTab(btn.dataset.tab);
+  if (window.innerWidth <= 700) document.body.classList.remove('nav-open');
+}));
+$('#menu-btn').addEventListener('click', () => {
+  document.body.classList.toggle('nav-open');
+});
 function switchTab(id) {
   document.querySelector('nav button.active')?.classList.remove('active');
   $(`nav button[data-tab="${id}"]`).classList.add('active');
