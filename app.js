@@ -169,6 +169,7 @@ async function refreshIdentities() {
         <div><strong>${value.name}</strong> <span class="pill">${value.algo}</span></div>
         <div class="mono muted">pk: ${b64u(value.pubRaw)}</div>
         <div style="margin-top:6px" class="row">
+          <button class="btn" data-share="${key}">Share</button>
           <button class="btn" data-export="${key}">Export Private (encrypted)</button>
           <button class="btn warn" data-del="${key}">Delete</button>
         </div>
@@ -196,7 +197,13 @@ $('#btn-create-id').addEventListener('click', async () => {
 
 $('#identity-list').addEventListener('click', async (e) => {
   const t = e.target;
-  if (t.dataset.export) {
+  if (t.dataset.share) {
+    const id = t.dataset.share; const rec = await db.ids.getItem(id);
+    const payload = { displayName: rec.name, algo: rec.algo, publicJwk: rec.pubJwk };
+    await QRCode.toCanvas($('#share-qr'), JSON.stringify(payload), { errorCorrectionLevel: 'M', margin: 1, width: 256 });
+    $('#share-name').textContent = rec.name;
+    $('#share-modal').style.display = 'flex';
+  } else if (t.dataset.export) {
     const id = t.dataset.export; const rec = await db.ids.getItem(id);
     const pass = $('#id-pass').value || prompt('Passphrase to encrypt private key export:');
     if (!pass) return;
@@ -208,6 +215,10 @@ $('#identity-list').addEventListener('click', async (e) => {
     await db.ids.removeItem(t.dataset.del);
     await refreshIdentities();
   }
+});
+
+$('#share-close').addEventListener('click', () => {
+  $('#share-modal').style.display = 'none';
 });
 
 $('#btn-import-id').addEventListener('click', async () => {
