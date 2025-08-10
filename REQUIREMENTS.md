@@ -5,6 +5,7 @@
 ### 1.1 User Identity Management
 - Create, manage, share (public key + name only), and delete identities.
 - Public keys shared via QR code or text.
+- Private keys remain non-exportable once generated.
 
 ### 1.2 Contacts Management
 - Import contacts using QR code or text input of public key + name.
@@ -25,7 +26,7 @@
 - Extract QR code and verify signature against hash.
 
 ## 2. Non-Functional Requirements
-- Private keys never leave device; use secure storage.
+- Private keys never leave device; use secure storage with non-exportable keys.
 - Signing and QR generation should complete in under 500 ms on typical devices.
 - Emphasize client-side operations for low-cost hosting.
 - Single codebase targeting web, iOS, and Android.
@@ -57,7 +58,7 @@
 
 ## 6. Framework and Tooling
 
-- **Frontend:** Expo (React Native + web). Use TypeScript, `expo-camera`, `expo-secure-store`, `noble-ed25519`, `jsqr`/`zxing`, `react-native-qrcode-svg`, `expo-sharing`.
+- **Frontend:** Expo (React Native + web). Use TypeScript, `expo-camera`, `expo-secure-store`, `jsqr`/`zxing`, `react-native-qrcode-svg`, `expo-sharing`.
 - **Backend:** Supabase or Firebase for storage, serverless functions, and optional profile lookup.
 
 ## 7. Hosting Suggestions
@@ -72,7 +73,7 @@
 ## 8. Development Workflow
 
 1. Initialize monorepo with Expo.
-2. Implement cryptographic utilities using `webcrypto` or `noble-ed25519`.
+2. Implement cryptographic utilities using WebCrypto.
 3. Build identity and contact management screens.
 4. Implement photo capture, hashing, signing, and QR overlay.
 5. Add sharing and verification screens.
@@ -83,7 +84,7 @@
 ## 9. Security Considerations
 
 - Use HTTPS for web.
-- Store private keys in secure storage; never transmit to backend.
+- Store private keys in secure storage as non-exportable keys; never transmit to backend.
 - Validate imported contacts to prevent malformed keys.
 - Treat QR code region as opaque when hashing.
 
