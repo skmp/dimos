@@ -10,7 +10,7 @@
 <body>
 <header>
   <button id="menu-btn" class="menu-btn">☰</button>
-  <h1>Client-Only Photo Signer & Verifier <span class="pill">Ed25519 / P-256</span> <span class="pill">No backend</span></h1>
+  <h1>Client-Only Photo Signer & Verifier <span class="pill">Ed25519</span> <span class="pill">No backend</span></h1>
   <div class="host">Deploy: upload this file to GitHub Pages</div>
 </header>
 <main>
@@ -19,7 +19,6 @@
     <button data-tab="contacts">Contacts</button>
     <button data-tab="capture">Capture & Sign</button>
     <button data-tab="verify">Verify</button>
-    <button data-tab="backup">Backup</button>
     <hr style="border-color:var(--muted); opacity:.5">
     <button data-tab="about">About</button>
   </nav>
@@ -30,17 +29,6 @@
         <div>
           <label>Display name</label>
           <input id="id-name" type="text" placeholder="e.g., Alice Photographer" />
-        </div>
-        <div>
-          <label>Algorithm</label>
-          <select id="id-algo">
-            <option value="Ed25519" selected>Ed25519 (preferred)</option>
-            <option value="P-256">P-256 (ECDSA)</option>
-          </select>
-        </div>
-        <div>
-          <label>Passphrase (encrypt private key export)</label>
-          <input id="id-pass" type="password" placeholder="Optional (recommended for export)" />
         </div>
       </div>
       <div style="margin-top:8px">
@@ -53,17 +41,6 @@
       <div id="identity-list" class="grid"></div>
     </div>
 
-    <div class="card">
-      <h2>Import Private Identity</h2>
-      <p class="muted">Paste an encrypted private JWK export produced by this app. Decrypts with your passphrase.</p>
-      <label>Encrypted Export (JSON)</label>
-      <textarea id="id-import-json" rows="6" class="mono" placeholder='{"name":"...","algo":"Ed25519", ...}'></textarea>
-      <label>Passphrase</label>
-      <input id="id-import-pass" type="password" />
-      <div style="margin-top:8px">
-        <button class="btn" id="btn-import-id">Import</button>
-      </div>
-    </div>
   </section>
 
   <section id="contacts" class="tab" style="display:none">
@@ -73,13 +50,6 @@
         <div>
           <label>Display name</label>
           <input id="contact-name" type="text" />
-        </div>
-        <div>
-          <label>Algorithm</label>
-          <select id="contact-algo">
-            <option value="Ed25519" selected>Ed25519</option>
-            <option value="P-256">P-256</option>
-          </select>
         </div>
       </div>
       <label>Public Key (Base64URL or JWK)</label>
@@ -187,34 +157,12 @@
     </div>
   </section>
 
-  <section id="backup" class="tab" style="display:none">
-    <div class="card">
-      <h2>Backup / Restore</h2>
-      <div class="row">
-        <div>
-          <label>Export Passphrase (for private keys)</label>
-          <input id="backup-pass" type="password" />
-        </div>
-      </div>
-      <div style="margin-top:8px">
-        <button class="btn" id="btn-backup">Export Backup JSON</button>
-      </div>
-      <h3>Restore</h3>
-      <textarea id="restore-json" rows="8" class="mono" placeholder="Paste backup JSON"></textarea>
-      <label>Restore Passphrase</label>
-      <input id="restore-pass" type="password" />
-      <div style="margin-top:8px">
-        <button class="btn" id="btn-restore">Restore</button>
-      </div>
-    </div>
-  </section>
-
   <section id="about" class="tab" style="display:none">
     <div class="card">
       <h2>About</h2>
       <p>This single-file SPA implements a client-only photo signing and verification workflow: local identities, deterministic hashing with a blackened QR region, QR embedding, and verification.</p>
       <ul class="kvl">
-        <li>Keys: Ed25519 (preferred) via WebCrypto, with P-256 fallback; @noble/ed25519 as optional fallback.</li>
+        <li>Keys: Ed25519 via WebCrypto.</li>
         <li>QR: generated client-side; read via jsQR.</li>
         <li>Storage: IndexedDB via localForage.</li>
         <li>No build step. Deploy this <code>index.html</code> on GitHub Pages.</li>
@@ -237,8 +185,6 @@
 <script src="https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@noble/ed25519@2.1.0/lib/index.umd.min.js"></script>
-
 <script type="module" src="app.js"></script>
 
 </body>
